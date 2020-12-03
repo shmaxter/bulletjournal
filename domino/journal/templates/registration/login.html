@@ -1,0 +1,12 @@
+{% extends "journal/base.html" %}
+{% block content %}
+<!-- Crispy Form-->
+{% load crispy_forms_tags %}
+<h3>Login Here</h3>
+<form method="post" class="form-group">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="submit" class="btn btn-success">Login</button>
+    <p>Don't Have an account? Create one <a href="/domino/register">here</a></p>
+</form>
+{% endblock %}

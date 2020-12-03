@@ -1,0 +1,234 @@
+{% extends 'journal/base.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+{% load crispy_forms_tags %}
+<div class="domino_buttons">
+    {% load static %}
+    {% if domino.assignedJourney.icon|length > 0 %}
+    <i class="icon d_button icon-bullet fas fa-{{domino.assignedJourney.icon}}"></i>
+    {% endif %}
+    {% if domino.parentId %}
+    <a href="/domino/id/{{domino.parentId.id}}"><i class="d_button new fas fa-chevron-left"></i></a>
+    {% else %}
+    <a href="/domino/"><i class="d_button new fas fa-home"></i></a>
+    {% endif %}
+    <a href="/domino/new/{{domino.id}}"><i class="d_button new fas fa-circle"></i></a>
+    <a href="/domino/edit/{{domino.id}}"><i class="d_button new fas fa-edit"></i></a>
+    <a href="/domino/time/{{domino.id}}"><i class="d_button time fas fa-clock"></i></a>
+    <a href="/domino/note/{{domino.id}}"><i class="d_button note fas fa-sticky-note"></i></a>
+    <a href="/domino/delete/{{domino.id}}" class="trash"><i class="d_button fas fa-trash"></i></a>
+    {% if domino.isCompleted %}
+    <a href="/domino/complete/{{domino.id}}" class="completedom"><i
+            class="d_button check fas fa-check-square completed"></i></a>
+    {% else %}
+    <a href="/domino/complete/{{domino.id}}" class="completedom"><i
+            class="d_button check fas fa-check-square incomplete"></i></a>
+    {% endif %}
+    {% if domino.isPinned %}
+    <a href="/domino/pin/{{domino.id}}" class="pindom"><i class="d_button fas fa-thumbtack pinned"></i></a>
+    {% else %}
+    <a href="/domino/pin/{{domino.id}}" class="pindom"><i class="d_button fas fa-thumbtack unpinned"></i></a>
+    {% endif %}
+</div>
+<div class="row">
+    <div class="domino col-md-9 maindom time-{{domino.timeset}}" id="d{{domino.id}}">
+        <div class="head">
+            <i class="icon icon-bullet fas fa-circle"></i>
+            {{domino.head}}
+        </div>
+        <div class="journeys">
+            {% for journey in domino.assignedJourney.all %}
+            <i class="icon dtop icon-journey fas fa-{{journey.icon}}"></i>
+            {% endfor %}
+            {% if domino.isPinned %}
+            <i class="fas fa-thumbtack pinned dtop"></i>
+            {% endif %}
+        </div>
+        <div style="clear:both;"></div>
+        <div class="body row">
+            {% if domino.body %}
+            <div class="hidethis body col-md-8">
+                {{domino.body|linebreaks}}
+            </div>
+            {% endif %}
+            <div class="list col-md-4 hidethis">
+                <!--List Items-->
+                <form method="post" class="form-group" action="/domino/list/{{domino.id}}/">
+                    {% csrf_token %}
+                    {{ listform|crispy }}
+                    <input type="submit" value="New List Item">
+                </form>
+                {% if lists %}
+                {% for list in lists %}
+
+                <div class="listitem">
+                    {% if list.checked %}
+                    <a href="/domino/listitem/{{list.id}}"><i class="fas fa-check-square completed"></i></a>
+                    {% else %}
+                    <a href="/domino/listitem/{{list.id}}"><i class="fas fa-square"></i></a>
+                    {% endif %}
+                    {{list.content}}
+                </div>
+
+                {% endfor %}
+                {% endif %}
+            </div>
+            <div class="col-md-12">
+                <!--Insert Dominos Here-->
+
+                <div id="pinned-dominos" class="row">
+                    {% for domino in pinneddominos %}
+                    <div class="domino_container col-md-12 col-sm-12">
+                        <a href="/domino/id/{{domino.id}}" class="dlink">
+                            <div class="domino subdom" id="d{{domino.id}}">
+                                <div class="head">
+                                    <i class="icon icon-bullet fas fa-circle"></i>
+                                    {{domino.head}}
+                                </div>
+                                <div class="journeys">
+                                    {% for journey in domino.assignedJourney.all %}
+                                    <i class="icon dtop icon-journey fas fa-{{journey.icon}}"></i>
+                                    {% endfor %}
+                                    <i class="fas fa-thumbtack pinned dtop"></i>
+                                </div>
+                                <div class="dom_actions">
+                                    <a href="/domino/complete/p/{{domino.id}}">
+                                        <i class="icon fas fa-check-square"></i>
+                                    </a>
+                                    <a href="/domino/pin/p/{{domino.id}}">
+                                        <i class="icon fas fa-thumbtack"></i>
+                                    </a>
+                                    <a href="/domino/time/{{domino.id}}">
+                                        <i class="icon fas fa-clock"></i>
+                                    </a>
+                                    <a href="/domino/delete/p/{{domino.id}}">
+                                        <i class="icon fas fa-trash"></i>
+                                    </a>
+                                </div>
+                                <div style="clear:both;"></div>
+                                {% if domino.body %}
+                                <div class="hidethis body col-md-8">
+                                    {{domino.body|linebreaks}}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </a>
+
+                    </div>
+                    {% endfor %}
+                </div>
+                <!--<hr style="border-top: 2px solid rgba(0,0,0,.5);">-->
+                <div id="regular-dominos" class="row">
+                    {% for notedom in notedoms %}
+                    {% if notedom.head %}
+                    <div class="domino_container col-md-12 col-sm-12 completed-{{notedom.isCompleted}}">
+                        <a href="/domino/id/{{notedom.id}}" class="dlink">
+                            <div class="domino subdom" id="d{{notedom.id}}">
+                                <div class="head">
+                                    <i class="icon icon-bullet fas fa-circle"></i>
+                                    {{notedom.head}}
+                                </div>
+                                <div class="journeys">
+                                    {% if notedom.isCompleted %}
+                                    <i class="icon fas fa-check-square dtop completed"></i>
+                                    {% endif %}
+                                    {% for journey in notedom.assignedJourney.all %}
+                                    <i class="icon icon-journey dtop fas fa-{{journey.icon}}"></i>
+                                    {% endfor %}
+                                </div>
+                                <div class="dom_actions">
+                                    <a href="/domino/complete/p/{{notedom.id}}">
+                                        <i class="icon fas fa-check-square"></i>
+                                    </a>
+                                    <a href="/domino/pin/p/{{notedom.id}}">
+                                        <i class="icon fas fa-thumbtack"></i>
+                                    </a>
+                                    <a href="/domino/time/{{notedom.id}}">
+                                        <i class="icon fas fa-clock"></i>
+                                    </a>
+                                    <a href="/domino/delete/p/{{notedom.id}}">
+                                        <i class="icon fas fa-trash"></i>
+                                    </a>
+                                </div>
+                                <div style="clear:both;"></div>
+                                {% if notedom.body %}
+                                <div class="hidethis body col-md-8">
+                                    {{notedom.body|linebreaks}}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="paper">
+                        <div class="pattern">
+                            <div class="content">
+                                {% if notedom.title %}
+                                <b>{{notedom.title}}</b>
+                                <br>
+                                {% endif %}
+                                {{notedom.content|linebreaks}}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    <!--{% for domino in dominos %}
+                <div class="domino_container col-md-12 col-sm-12">
+                    <a href="/domino/id/{{domino.id}}" class="dlink">
+                        <div class="domino">
+                            <div class="head">
+                                <i class="icon icon-bullet fas fa-circle"></i>
+                                {{domino.head}}
+                            </div>
+                            <div class="journeys">
+                                {% if domino.isCompleted %}
+                                <i class="icon fas fa-check-square dtop completed"></i>
+                                {% endif %}
+                                {% for journey in domino.assignedJourney.all %}
+                                <i class="icon icon-journey dtop fas fa-{{journey.icon}}"></i>
+                                {% endfor %}
+                            </div>
+                            <div style="clear:both;"></div>
+                            {% if domino.body %}
+                            <div class="hidethis body col-md-8">
+                                {{domino.body|linebreaks}}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+                {% for note in notes %}
+                <div class="paper">
+                    <div class="pattern">
+                        <div class="content">
+                            {% if note.title %}
+                            <b>{{note.title}}</b>
+                            <br>
+                            {% endif %}
+                            {{note.content|linebreaks}}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if domino.timeset %}
+    <div class="timeblocks col-md-3">
+        {% for timedom in timedoms %}
+        <div class="timeblock">
+            <span><i class="fas fa-clock" aria-hidden="true"></i> {{timedom.timeset}}</span>
+            <div>{{timedom.description}}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% else %}
+<p><a href="login">Login Here</a></p>
+{% endif %}
+{% endblock %}

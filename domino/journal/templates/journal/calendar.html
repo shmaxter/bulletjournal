@@ -1,0 +1,103 @@
+{% extends 'journal/base.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+{% load crispy_forms_tags %}
+<div class="domino_buttons">
+    {% load static %}
+    <a href="/domino/new"><i class="d_button new fas fa-circle"></i></a>
+    <a href="/domino/newjourney"><i class="d_button collection fas fa-play"></i></a>
+    <a href="/domino/calendar"><i class="d_button calender fas fa-calendar"></i></a>
+</div>
+<h1>Everything Here</h1>
+{{calendar | safe}}
+<h2>Today</h2>
+{% for timedom in daydoms %}
+<a href="/domino/id/{{timedom.domino.id}}" class="dlink">
+    <div class="domino_container col-md-12 col-sm-12 completed-{{timedom.domino.isCompleted}}">
+
+        <div class="domino" id="d{{domino.id}}">
+
+            <div class="head">
+                <i class="icon icon-bullet fas fa-circle"></i>
+                {{timedom.domino.head}}
+            </div>
+
+            <div class="journeys">
+                {% for journey in timedom.domino.assignedJourney.all %}
+                <i class="icon icon-journey fas fa-{{journey.icon}}"></i>
+                {% endfor %}
+                {% if timedom.domino.isCompleted %}
+                <i class="icon fas fa-check-square completed"></i>
+                {% endif %}
+            </div>
+            <div class="dom_actions">
+                <a href="/domino/complete/h/{{timedom.domino.id}}">
+                    <i class="icon fas fa-check-square"></i>
+                </a>
+                <a href="/domino/pin/h/{{timedom.domino.id}}">
+                    <i class="icon fas fa-thumbtack"></i>
+                </a>
+                <a href="/domino/delete/h/{{timedom.domino.id}}">
+                    <i class="icon fas fa-trash"></i>
+                </a>
+            </div>
+            <div style="clear: both;"></div>
+            {% if timedom.domino.body %}
+            <div class="body">
+                {{timedom.domino.body|linebreaks}}
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</a>
+{% endfor %}
+<h2>Month</h2>
+{% for timedom in monthdoms %}
+<a href="/domino/id/{{timedom.domino.id}}" class="dlink">
+    <div class="domino_container col-md-12 col-sm-12 completed-{{timedom.domino.isCompleted}}">
+
+        <div class="domino" id="d{{domino.id}}">
+
+            <div class="head">
+                <i class="icon icon-bullet fas fa-circle"></i>
+                {{timedom.domino.head}}
+            </div>
+
+            <div class="journeys">
+                {% for journey in timedom.domino.assignedJourney.all %}
+                <i class="icon icon-journey fas fa-{{journey.icon}}"></i>
+                {% endfor %}
+                {% if timedom.domino.isCompleted %}
+                <i class="icon fas fa-check-square completed"></i>
+                {% endif %}
+            </div>
+            <div class="dom_actions">
+                <a href="/domino/complete/h/{{timedom.domino.id}}">
+                    <i class="icon fas fa-check-square"></i>
+                </a>
+                <a href="/domino/pin/h/{{timedom.domino.id}}">
+                    <i class="icon fas fa-thumbtack"></i>
+                </a>
+                <a href="/domino/delete/h/{{timedom.domino.id}}">
+                    <i class="icon fas fa-trash"></i>
+                </a>
+            </div>
+            <div style="clear: both;"></div>
+            {% if timedom.domino.body %}
+            <div class="body">
+                {{timedom.domino.body|linebreaks}}
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</a>
+{% endfor %}
+{{monthdoms|length}}
+{{daydoms|length}}
+{{nowday}}
+{% else %}
+<p><a href="login">Login Here</a></p>
+{% endif %}
+{% endblock %}

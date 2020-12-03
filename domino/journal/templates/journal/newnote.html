@@ -1,0 +1,18 @@
+{% extends 'journal/base.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+{% load crispy_forms_tags %}
+
+<div class="domino">
+
+    <form method="post" class="form-group">
+        {% csrf_token %}
+        {{ noteform|crispy }}
+        <input type="submit" value="Submit Note">
+        {{noteform.error_messages}}
+    </form>
+</div>
+{% else %}
+<p><a href="login">Login Here</a></p>
+{% endif %}
+{% endblock %}

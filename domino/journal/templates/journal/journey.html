@@ -1,0 +1,18 @@
+{% extends 'journal/base.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+{% load crispy_forms_tags %}
+
+<div class="new-journey">
+    <form method="post" class="form-group">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input type="submit" value="Create">
+    </form>
+</div>
+{{form.errors}}
+
+{% else %}
+<p><a href="login">Login Here</a></p>
+{% endif %}
+{% endblock %}
