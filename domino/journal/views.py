@@ -38,7 +38,8 @@ def calendar(request):
     user = request.user
     #dominos = Domino.objects.filter(author=user.id, isPinned = False, parentId__isnull=True, time).prefetch_related('assignedJourney').order_by('-id')
     journeys = Collection.objects.filter(author = user.id).order_by('id')    
-    monthdoms = TimeBlock.objects.filter(author = user.id, timeset__month = nowmonth)
+    #monthdoms = TimeBlock.objects.filter(author = user.id, timeset__month = nowmonth, DateCreated.datetime.now() : nowmonth, isCompleted: True )
+    monthdoms = TimeBlock.objects.filter(author = user.id, timeset__month = nowmonth )
     daydoms = TimeBlock.objects.filter(author = user.id, timeset__year=nowyear, timeset__month=nowmonth, timeset__day=nowday)
     return render(request, 'journal/calendar.html', {'user':user, 'calendar':nowcalendar, 'monthdoms':monthdoms, 'daydoms': daydoms, 'journeys': journeys, 'nowday': nowday})
 

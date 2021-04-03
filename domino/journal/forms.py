@@ -21,6 +21,7 @@ class NewDominoForm(ModelForm):
     def __init__(self, *args, **kwargs):
          self.author = kwargs.pop('author',None)
          super(NewDominoForm, self).__init__(*args, **kwargs)
+         self.fields['assignedJourney'].queryset = Collection.objects.filter(author=self.author)
     def save(self, user):
         instance = super(NewDominoForm, self).save(commit=False)
         instance.author = user

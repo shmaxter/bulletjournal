@@ -11,7 +11,7 @@ from django.utils import timezone
 class Collection(models.Model):
     journey = models.CharField(max_length=225)
     DateCreated = models.DateTimeField(default=timezone.now)
-    icon = models.CharField(max_length=255)
+    icon = models.CharField(max_length=255, blank = True)
     description = models.TextField(blank = True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, default = 1)
     #magic method
@@ -31,6 +31,7 @@ class Domino(models.Model):
     body = models.TextField(blank= True)
     DateCreated = models.DateTimeField(default=timezone.now)
     DateLastEditted = models.DateTimeField(default=timezone.now)
+    #DateCompleted = models.DateTimeField(blank=True)
     #Status(Pinned, Checked)    
     #User Link  
     author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
