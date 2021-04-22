@@ -74,7 +74,7 @@ footer{
     line-height: 1.25;
     font-weight: 700;
 }
-.domino .journeys{
+.domino .rightside{
 	display:block;
 	float: right;
     margin-bottom: 5px;
@@ -82,6 +82,21 @@ footer{
     /* font-size: 16px; */
     line-height: 1.25;
     font-weight: 700;
+}
+
+.domino .assignedJourneys{
+	color:rgb(53, 53, 226);
+	font-weight: 800;
+	float: left;;
+}
+.domino .assignedJourneys a{
+	margin-right:25px;
+}
+.jselected .domino .assignedJourneys{
+	display: none;
+}
+.domino .clear{
+	clear:both;
 }
 .domino .dom_actions{
 	display:none;
@@ -92,7 +107,7 @@ footer{
     line-height: 1.25;
     font-weight: 700;
 }
-.dominos_page .domino:hover .journeys{
+.dominos_page .domino:hover .rightside{
 	display:none;
 	float: right;
     margin-bottom: 5px;
@@ -179,6 +194,7 @@ footer{
 .dlink{
 	text-decoration: none;
 	color:#514B64;
+	margin-right: 0 !important;
 }
 .dlink:hover{
 	text-decoration: none;

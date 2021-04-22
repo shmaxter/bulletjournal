@@ -31,11 +31,14 @@ class Domino(models.Model):
     body = models.TextField(blank= True)
     DateCreated = models.DateTimeField(default=timezone.now)
     DateLastEditted = models.DateTimeField(default=timezone.now)
+    #DateCompleted = models.DateTimeField(null=True, blank= True)
+    #DatePinned = models.DateTimeField(null=True, blank= True)
     #DateCompleted = models.DateTimeField(blank=True)
     #Status(Pinned, Checked)    
     #User Link  
     author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
     assignedJourney = models.ManyToManyField(Collection, blank=True)
+    #thisJourney = models.ForeignKey(Collection, models.SET_NULL, blank=True, null=True)
     #dominoType = models.ForeignKey(Type,null=True,blank=True, on_delete=models.CASCADE)
     parentId = models.ForeignKey('self',null=True,blank=True, on_delete=models.CASCADE)
     isPinned = models.BooleanField(default=False)
@@ -45,6 +48,9 @@ class Domino(models.Model):
     #magic method
     def __str__(self):
         return self.head
+
+    def journey_name(self):
+        return self.assignedJourney.company_name
 
 
 

@@ -18,30 +18,12 @@ from calendar import HTMLCalendar
 def index(request):
     #Query Dominos
     user = request.user
-    pinneddominos = Domino.objects.filter(author=user.id, isPinned = True).prefetch_related('assignedJourney').order_by('-id')
-    dominos = Domino.objects.filter(author=user.id, isPinned = False, parentId__isnull=True).prefetch_related('assignedJourney').order_by('-id')
+    pinneddominos = Domino.objects.filter(author=user.id, isPinned = True).prefetch_related('assignedJourney').order_by('-DateLastEditted')
+    dominos = Domino.objects.filter(author=user.id, isPinned = False, parentId__isnull=True, isCompleted = False).prefetch_related('assignedJourney').order_by('-id')
+    completeddominos = Domino.objects.filter(author=user.id, isPinned = False, parentId__isnull=True, isCompleted = True).prefetch_related('assignedJourney').order_by('-DateLastEditted')
     journeys = Collection.objects.filter(author = user.id).order_by('id')    
-    return render(request, 'journal/dominos.html', {'user':user, 'dominos':dominos, 'pinneddominos':pinneddominos, 'journeys': journeys})
+    return render(request, 'journal/dominos.html', {'user':user, 'dominos':dominos,'completeddominos':completeddominos, 'pinneddominos':pinneddominos, 'journeys': journeys})
     #return HttpResponse("hi")
-
-
-
-def calendar(request):
-    #Query Dominos
-    thiscal = HTMLCalendar()
-    now = datetime.datetime.now()
-    nowyear = now.year
-    nowmonth = now.month
-    nowday = now.day
-    nowday = nowday - 1
-    nowcalendar = thiscal.formatmonth(nowyear, nowmonth, withyear=True)
-    user = request.user
-    #dominos = Domino.objects.filter(author=user.id, isPinned = False, parentId__isnull=True, time).prefetch_related('assignedJourney').order_by('-id')
-    journeys = Collection.objects.filter(author = user.id).order_by('id')    
-    #monthdoms = TimeBlock.objects.filter(author = user.id, timeset__month = nowmonth, DateCreated.datetime.now() : nowmonth, isCompleted: True )
-    monthdoms = TimeBlock.objects.filter(author = user.id, timeset__month = nowmonth )
-    daydoms = TimeBlock.objects.filter(author = user.id, timeset__year=nowyear, timeset__month=nowmonth, timeset__day=nowday)
-    return render(request, 'journal/calendar.html', {'user':user, 'calendar':nowcalendar, 'monthdoms':monthdoms, 'daydoms': daydoms, 'journeys': journeys, 'nowday': nowday})
 
 def domino(request, domino_id):
     #Query Dominos
@@ -66,54 +48,122 @@ def domino(request, domino_id):
     return render(request, 'journal/domino.html', {'user':user, 'domino':domino, 'listform':listform, 'notes': notes, 'dominos': dominos, 'pinneddominos': pinneddominos, 'notedoms': notedoms, 'timedoms': timedoms})
     #return HttpResponse("hi")
 
-def newlist(request, domino_id):
-    if request.method == 'POST':
-        user = request.user
-        form = NewListForm(request.POST)        
-        if form.is_valid():   
-            newlist = form.save(commit=False)
-            listdomino = Domino.objects.get(author=user.id,id = domino_id)
-            newlist.domino = listdomino
-            newlist.save()
-            rediredturl = '/domino/id/' + str(domino_id)
-            return redirect(rediredturl)       
-    else:        
-        return redirect('/domino')
+
+    
+
+#def new(request):
+#    if request.method == 'POST':
+#        user = request.user
+#        form = NewDominoForm(user,request.POST)        
+#        if form.is_valid():   
+#            #newdomino = form.save(user = user, parentId = None) 
+#            newdomino = form.save(commit=False)
+#            print(request)
+#            newdomino.author = user
+#            newdomino.parentId = None
+#            thisjourney = request.POST.get('assignedJourney')
+#            if(thisjourney):
+#                setjourney = Collection.objects.get(id=thisjourney)
+#                newdomino.save()
+#                newdomino.assignedJourney.add(setjourney)
+#                newdomino.save()    
+#            
+#            else:
+#                newdomino.save()
+#            
+#            
+#            rediredturl = '/domino/id/' + str(newdomino.id)
+#            return redirect(rediredturl)                  
+#    else:        
+#        user = request.user
+#        form = NewDominoForm(request.user)
+#        return render(request, 'journal/newdomino.html', {"form":form})
 
 def new(request):
     if request.method == 'POST':
         user = request.user
-        form = NewDominoForm(request.POST)        
-        if form.is_valid():   
-            newdomino = form.save(user = user, parentId = None)            
-            newdomino.save()
-            rediredturl = '/domino/id/' + str(newdomino.id)
-            return redirect(rediredturl)                  
+        data = request.POST
+        assignedJourneys = request.POST.getlist('checks[]')
+        #if(data['journey_new'] != ''):
+        #    journey, created = Collection.objects.get_or_create(journey=data['journey_new'],user=user)
+        
+        domino = Domino.objects.create(
+            head = data['title'],
+            body = data['body'],
+            #parentId = null,
+            author = user,
+        )
+        domino.assignedJourney.set(assignedJourneys)
+        domino.save()
+        rediredturl = '/domino/id/' + str(domino.id)
+        return redirect(rediredturl)                  
     else:        
         user = request.user
-        form = NewDominoForm(author=request.user)
-        return render(request, 'journal/newdomino.html', {'user':user,"form":form})
-        #return HttpResponse("hi")
+        assignedJourneys = Collection.objects.filter(author = user.id).order_by('id')
+        return render(request, 'journal/newdomino.html', {"assignedJourneys":assignedJourneys})
 
+
+
+
+
+
+#Update Domino
 def newsub(request, domino_id):
     if request.method == 'POST':
         user = request.user
-        form = NewDominoForm(request.POST)        
-        if form.is_valid():   
-            #newdomino = form.save(user = user)            
-            #newdomino.save()
-            #rediredturl = '/domino/id/' + str(newdomino.id)
-            parentdomino = Domino.objects.get(author=user.id,id = domino_id)
-            newdomino = form.save(user = user, parentId=parentdomino)            
-            newdomino.domino = parentdomino
-            newdomino.save()
-            rediredturl = '/domino/id/' + str(domino_id)# + '#d' + str(newdomino.id)
-            return redirect(rediredturl)                  
-    else:        
+        prentdomino = Domino.objects.get(author=user.id,id = domino_id)
+        data = request.POST
+        assignedJourneys = request.POST.getlist('checks[]')
+        #if(data['journey_new'] != ''):
+        #    journey, created = Collection.objects.get_or_create(journey=data['journey_new'],user=user)
+        
+        domino = Domino.objects.create(
+            head = data['title'],
+            body = data['body'],
+            parentId = prentdomino,
+            author = user,
+        )
+        domino.assignedJourney.set(assignedJourneys)
+        domino.save()
+        rediredturl = '/domino/id/' + str(domino.id)
+        return redirect(rediredturl)
+    else:
         user = request.user
-        form = NewDominoForm(author=request.user)
-        return render(request, 'journal/newdomino.html', {'user':user,"form":form})
-        #return HttpResponse("hi")
+        prentdomino = Domino.objects.get(author=user.id,id = domino_id)
+        assignedJourneys = Collection.objects.filter(author = user.id).order_by('id')
+        dominojourneys = prentdomino.assignedJourney.all()
+        assignedJourneys = [x for x in assignedJourneys if x not in dominojourneys]
+        return render(request, 'journal/editdomino.html', {"assignedJourneys":assignedJourneys,"dominojourneys":dominojourneys})
+
+
+
+
+
+
+#Update Domino
+def update(request, domino_id):
+    if request.method == 'POST':
+        user = request.user
+        domino = Domino.objects.get(author=user.id,id = domino_id)
+        data = request.POST
+        assignedJourneys = request.POST.getlist('checks[]')
+        #if(data['journey_new'] != ''):
+        #    journey, created = Collection.objects.get_or_create(journey=data['journey_new'],user=user)
+        
+        domino.head = data["title"]
+        domino.body = data["body"]
+        domino.assignedJourney.set(assignedJourneys)
+        domino.save()
+        rediredturl = '/domino/id/' + str(domino.id)
+        return redirect(rediredturl)
+    else:
+        user = request.user
+        domino = Domino.objects.get(author=user.id,id = domino_id)
+        assignedJourneys = Collection.objects.filter(author = user.id).order_by('id')
+        dominojourneys = domino.assignedJourney.all()
+        assignedJourneys = [x for x in assignedJourneys if x not in dominojourneys]
+        return render(request, 'journal/editdomino.html', {"domino":domino,"assignedJourneys":assignedJourneys,"dominojourneys":dominojourneys})
+
 
 def newnote(request, domino_id):
     if request.method == 'POST':
@@ -160,6 +210,7 @@ def pin(request, domino_id):
         domino.isPinned = False
     else:
         domino.isPinned = True
+    domino.DateLastEditted = timezone.now()
     domino.save()
     rediredturl = '/domino/id/' + str(domino_id)
     return redirect(rediredturl)
@@ -172,6 +223,7 @@ def pinParent(request, domino_id):
     else:
         domino.isPinned = True
         domino.isCompleted = False
+    domino.DateLastEditted = timezone.now()
     domino.save()
     rediredturl = '/domino/id/' + str(domino.parentId.id) + '#d' + str(domino.id)
     return redirect(rediredturl)
@@ -186,6 +238,7 @@ def pinHome(request, domino_id):
     else:
         domino.isPinned = True
         domino.isCompleted = False
+    domino.DateLastEditted = timezone.now()
     domino.save()    
     rediredturl = '/domino#d' + str(domino_id)
     return redirect(rediredturl)
@@ -200,8 +253,10 @@ def completeHome(request, domino_id):
     else:
         domino.isCompleted = True
         domino.isPinned = False
+    domino.DateLastEditted = timezone.now()
     domino.save()
-    rediredturl = '/domino#d' + str(domino_id)
+    #rediredturl = '/domino#d' + str(domino_id)
+    rediredturl = '/domino'
     return redirect(rediredturl)
 
 def completeParent(request, domino_id):
@@ -212,6 +267,7 @@ def completeParent(request, domino_id):
     else:
         domino.isCompleted = True
         domino.isPinned = False
+    domino.DateLastEditted = timezone.now()
     domino.save()
     rediredturl = '/domino/id/' + str(domino.parentId.id) + '#d' + str(domino.id)
     return redirect(rediredturl)
@@ -225,6 +281,7 @@ def complete(request, domino_id):
     else:
         domino.isCompleted = True
         domino.isPinned = False
+    domino.DateLastEditted = timezone.now()
     domino.save()
     rediredturl = '/domino/id/' + str(domino.id)
     return redirect(rediredturl)
@@ -243,25 +300,6 @@ def listitem(request, list_id):
         
 
 
-#Update Domino
-def update(request, domino_id):
-    if request.method == 'POST':
-        user = request.user
-        domino = Domino.objects.get(author=user.id,id = domino_id)
-        parentid = domino.parentId
-        form = NewDominoForm(request.POST, instance = domino)
-        if form.is_valid():   
-            editdomino = form.save(user = user, parentId = parentid)            
-            editdomino.author = user            
-            editdomino.save()
-            rediredturl = '/domino/id/' + str(domino_id)
-            return redirect(rediredturl)
-    else:
-        user = request.user
-        domino = Domino.objects.get(author=user.id,id = domino_id)
-        form = NewDominoForm(instance = domino)        
-        return render(request, 'journal/newdomino.html', {'user':user,"form":form})
-
 def journey(request, journey_id):
     #Query Dominos
     user = request.user
@@ -269,8 +307,9 @@ def journey(request, journey_id):
     journey = Collection.objects.get(author=user.id,id = journey_id)
     journeySelected = True;    
     pinneddominos = Domino.objects.filter(author=user.id, isPinned = True, assignedJourney = journey).order_by('-id')
-    dominos = Domino.objects.filter(author=user.id, isPinned = False, assignedJourney = journey).order_by('-id')
-    return render(request, 'journal/dominos.html', {'user':user, 'dominos':dominos, 'pinneddominos':pinneddominos, 'journeySelected': journeySelected, 'journey': journey})
+    dominos = Domino.objects.filter(author=user.id, isPinned = False, assignedJourney = journey, isCompleted = False).order_by('-id')
+    completeddominos = Domino.objects.filter(author=user.id, isPinned = False, assignedJourney = journey, isCompleted = True).order_by('-id')
+    return render(request, 'journal/dominos.html', {'user':user, 'dominos':dominos,'completeddominos':completeddominos, 'pinneddominos':pinneddominos, 'journeySelected': journeySelected, 'journey': journey})
     #return HttpResponse("hi")
 
 def delete(request, delete_id):
@@ -332,6 +371,7 @@ def register(response):
         form = RegisterForm(response.POST)
         if form.is_valid():
             form.save()
+            return redirect('/domino/login')
 
         
     else:

@@ -18,36 +18,37 @@ class RegisterForm(UserCreationForm):
 
 
 class NewDominoForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-         self.author = kwargs.pop('author',None)
-         super(NewDominoForm, self).__init__(*args, **kwargs)
-         self.fields['assignedJourney'].queryset = Collection.objects.filter(author=self.author)
-    def save(self, user):
-        instance = super(NewDominoForm, self).save(commit=False)
-        instance.author = user
-        instance.save()
-        self.save_m2m()
-        return instance    
-    def save(self, user, parentId):
-        instance = super(NewDominoForm, self).save(commit=False)
-        instance.author = user
-        instance.parentId = parentId
-        instance.save()
-        self.save_m2m()
-        return instance    
+    #def save(self, user):
+    #    instance = super(NewDominoForm, self).save(commit=False)
+    #    instance.author = user
+    #    instance.save()
+    #    self.save_m2m()
+    #    return instance    
+    #def save(self, user, parentId):
+    #    instance = super(NewDominoForm, self).save(commit=False)
+    #    instance.author = user
+    #    instance.parentId = parentId
+    #    instance.save()
+    #    self.save_m2m()
+    #    return instance    
     class  Meta:
         model = Domino
-        fields = ['head', 'body', 'author','DateCreated', 'DateLastEditted', 'assignedJourney']
-        widgets = {'author': forms.HiddenInput(), 'DateCreated': forms.HiddenInput(), 'DateLastEditted': forms.HiddenInput()}
+        fields = ['head', 'body', 'assignedJourney']
+        widgets = {'DateCreated': forms.HiddenInput(), 'DateLastEditted': forms.HiddenInput()}
         error_messages = {
             NON_FIELD_ERRORS: {
                 'unique_together': "%(model_name)s's %(field_labels)s are not unique.",
             }
         }
+    def __init__(self, user, *args, **kwargs):
+         #self.author = kwargs.pop('author',None)
+         super(NewDominoForm, self).__init__(*args, **kwargs)
+         self.fields['assignedJourney'].queryset = Collection.objects.filter(author=user)
 
 
 #Journey Creation
 class NewJourneyForm(ModelForm):
+
     def __init__(self, *args, **kwargs):
          self.author = kwargs.pop('author',None)
          super(NewJourneyForm, self).__init__(*args, **kwargs)
