@@ -1,18 +1,210 @@
 {% extends 'journal/base.html' %}
 {% block content %}
 {% if user.is_authenticated %}
-{% load crispy_forms_tags %}
+<div class="row">
+    <div class="col-md-3 journey-container">
+        <!--Insert Journeys Here-->
+        <a href="/domino/newjourney"><i class="d_button collection fas fa-play"></i></a>
+        <i class="icon icon-journey fas fa-{{journey.icon}} selected"></i>
+        <div class="name selected">{{journey.journey}}</div>
+        {% for j in journeys %}
+        <a href="/domino/journey/journey.id">
+           
+            <i class="icon icon-journey fas fa-{{journey.icon}}"></i>
+            <div class="name">{{j.journey}}</div>
+           
+        </a>
+        {% endfor %}
+    </div>
+    {% if journeySelected %}
+    <div class="col-md-9 dominos_page jselected">
+    {% else %}
+    <div class="col-md-9 dominos_page">
+    {% endif %}
+    
+        <!--Insert Dominos Here-->
+        <div class="domino_buttons">
+            {% load static %}
+            <a href="/domino/new/j/{{journey.id}}"><i class="d_button new fas fa-circle"></i></a>
+            <!--<a href="/domino/calendar"><i class="d_button calender fas fa-calendar"></i></a>-->
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div id="pinned-dominos" class="row">
+                    {% for domino in pinneddominos %}
+                    
+                        <div class="domino_container col-md-12 col-sm-12"  onclick="window.location.href='/domino/id/{{domino.id}}'">
+        
+                            <div class="domino" id="d{{domino.id}}">
+        
+                                
+                                <div class="assignedJourneys">
+                                    {% for journey in domino.assignedJourney.all %}
+                                    <a href="/domino/journey/journey.id">{{journey.journey}}</a>
+                                    {% endfor %}
+                                    <span></span>
+                                </div>
 
-<div class="new-journey">
-    <form method="post" class="form-group">
-        {% csrf_token %}
-        {{ form|crispy }}
-        <input type="submit" value="Create">
-    </form>
+                                <div class="rightside">
+                                    
+                                    {% for journey in domino.assignedJourney.all %}
+                                    <i class="icon icon-journey fas fa-{{journey.icon}}"></i>
+                                    {% endfor %}
+                                    <i class="fas fa-thumbtack pinned"></i>
+                                </div>
+                                <div class="clear"></div>
+
+                                <div class="head">
+                                    <i class="icon icon-bullet fas fa-circle"></i>
+                                    {{domino.head}}
+                                </div>
+                                
+                                
+                                <div class="dom_actions">
+                                    <a href="/domino/complete/j/{{journey.id}}/f/{{domino.id}}">
+                                        <i class="icon fas fa-check-square"></i>
+                                    </a>
+                                    <a href="/domino/pin/j/{{journey.id}}/f/{{domino.id}}">
+                                        <i class="icon fas fa-thumbtack"></i>
+                                    </a>
+                                    <a href="/domino/delete/j/{{journey.id}}/f/{{domino.id}}">
+                                        <i class="icon fas fa-trash"></i>
+                                    </a>
+                                </div>
+                                <div style="clear:both;"></div>
+                                {% if domino.body %}
+                                <div class="body">
+                                    {{domino.body|linebreaks}}
+                                </div>
+                                {% endif %}
+                            </div>
+        
+                        </div>
+                    
+                    {% endfor %}
+                </div>
+                <hr style="border-top: 2px solid rgba(0,0,0,.5);">
+                <div id="regular-dominos" class="row">
+                    {% for domino in dominos %}
+                    
+                        <div class="domino_container col-md-12 col-sm-12 completed-{{domino.isCompleted}}" onclick="window.location.href='/domino/id/{{domino.id}}'">
+        
+                            <div class="domino" id="d{{domino.id}}">
+        
+                                <div class="assignedJourneys">
+                                    {% for journey in domino.assignedJourney.all %}
+                                    <a href="/domino/journey/journey.id">{{journey.journey}}</a>
+                                    {% endfor %}
+                                    <span></span>
+                                </div>
+
+                                
+                                <div class="rightside">
+                                    
+                                    {% if domino.isCompleted %}
+                                    <i class="icon fas fa-check-square completed"></i>
+                                    {% endif %}
+                                </div>
+
+
+                                <div class="clear"></div>
+                                
+                                
+                                <div class="head">
+                                    <i class="icon icon-bullet fas fa-circle"></i>
+                                    {{domino.head}}
+                                </div>
+                                
+                                
+                                <div class="dom_actions">
+                                    <a href="/domino/complete/j/{{journey.id}}/f/{{domino.id}}">
+                                        <i class="icon fas fa-check-square"></i>
+                                    </a>
+                                    <a href="/domino/pin/j/{{journey.id}}/f/{{domino.id}}">
+                                        <i class="icon fas fa-thumbtack"></i>
+                                    </a>
+                                    <a href="/domino/delete/j/{{journey.id}}/f/{{domino.id}}">
+                                        <i class="icon fas fa-trash"></i>
+                                    </a>
+                                </div>
+                                <div style="clear: both;"></div>
+                                {% if domino.body %}
+                                <div class="body">
+                                    {{domino.body|linebreaks}}
+                                </div>
+                                {% endif %}
+                            </div>
+        
+                        </div>
+                    
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-md-6">
+                
+                <div id="completed-dominos" class="row">
+                    {% for domino in completeddominos %}
+                   
+                        <div class="domino_container col-md-12 col-sm-12 completed-{{domino.isCompleted}}"  onclick="window.location.href='/domino/id/{{domino.id}}'">
+        
+                            <div class="domino" id="d{{domino.id}}">
+                                
+                                <div class="assignedJourneys">
+                                    {% for journey in domino.assignedJourney.all %}
+                                    <a href="/domino/journey/journey.id">{{journey.journey}}</a>
+                                    {% endfor %}
+                                    <span></span>
+                                </div>
+
+                                
+                                <div class="rightside">
+                                    
+                                    {% if domino.isCompleted %}
+                                    <i class="icon fas fa-check-square completed"></i>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="clear"></div>
+                                
+                                
+                                <div class="head">
+                                    <i class="icon icon-bullet fas fa-circle"></i>
+                                    {{domino.head}}
+                                </div>
+                                
+
+                              
+                                
+                                <div class="dom_actions">
+                                    <a href="/domino/complete/j/{{journey.id}}/f/{{domino.id}}">
+                                        <i class="icon fas fa-check-square"></i>
+                                    </a>
+                                    <a href="/domino/pin/j/{{journey.id}}/f/{{domino.id}}">
+                                        <i class="icon fas fa-thumbtack"></i>
+                                    </a>
+                                    <a href="/domino/delete/j/{{journey.id}}/f/{{domino.id}}">
+                                        <i class="icon fas fa-trash"></i>
+                                    </a>
+                                </div>
+                                <div style="clear: both;"></div>
+                                {% if domino.body %}
+                                <div class="body">
+                                    {{domino.body|linebreaks}}
+                                </div>
+                                {% endif %}
+                            </div>
+        
+                        </div>
+                    
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        {% else %}
+        <p><a href="login">Login Here</a></p>
+        {% endif %}
+    </div>
 </div>
-{{form.errors}}
 
-{% else %}
-<p><a href="login">Login Here</a></p>
-{% endif %}
 {% endblock %}

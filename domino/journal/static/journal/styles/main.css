@@ -252,10 +252,11 @@ i.fa-circle{
 }
 .journey-container .name{
 	font-size: 21px;
-	color: skyblue;
-	font-weight: 800;
-	text-align: center;
-	margin-bottom:25px;
+    color: skyblue;
+    font-weight: 800;
+    text-align: center;
+    margin-top: 25px;
+    margin-bottom: -10px;
 }
 .journey-container .name.selected{
 	color:blue;

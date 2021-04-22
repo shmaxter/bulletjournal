@@ -2,7 +2,7 @@
 {% block content %}
 {% if user.is_authenticated %}
 <div class="row">
-    <div class="col-md-2 journey-container">
+    <div class="col-md-3 journey-container">
         <!--Insert Journeys Here-->
         <a href="/domino/newjourney"><i class="d_button collection fas fa-play"></i></a>
         <i class="icon icon-journey fas fa-{{journey.icon}} selected"></i>
@@ -20,9 +20,9 @@
         {% endfor %}
     </div>
     {% if journeySelected %}
-    <div class="col-md-10 dominos_page jselected">
+    <div class="col-md-9 dominos_page jselected">
     {% else %}
-    <div class="col-md-10 dominos_page">
+    <div class="col-md-9 dominos_page">
     {% endif %}
     
         <!--Insert Dominos Here-->
