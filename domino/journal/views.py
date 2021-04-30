@@ -334,9 +334,9 @@ def journey(request, journey_id):
     journeys = Collection.objects.filter(author = user.id).exclude(id = journey_id).order_by('id')    
     journey = Collection.objects.get(author=user.id,id = journey_id)
     journeySelected = True;    
-    pinneddominos = Domino.objects.filter(author=user.id, isPinned = True, assignedJourney = journey).order_by('-id')
+    pinneddominos = Domino.objects.filter(author=user.id, isPinned = True, assignedJourney = journey).order_by('-DateLastEditted')
     dominos = Domino.objects.filter(author=user.id, isPinned = False, assignedJourney = journey, isCompleted = False).order_by('-id')
-    completeddominos = Domino.objects.filter(author=user.id, isPinned = False, assignedJourney = journey, isCompleted = True).order_by('-id')
+    completeddominos = Domino.objects.filter(author=user.id, isPinned = False, assignedJourney = journey, isCompleted = True).order_by('-DateLastEditted')
     return render(request, 'journal/journey.html', {'user':user, 'dominos':dominos,'completeddominos':completeddominos, 'pinneddominos':pinneddominos, 'journeySelected': journeySelected, 'journey': journey, 'journeys': journeys})
     #return HttpResponse("hi")
 

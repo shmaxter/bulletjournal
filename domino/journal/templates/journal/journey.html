@@ -8,9 +8,9 @@
         <i class="icon icon-journey fas fa-{{journey.icon}} selected"></i>
         <div class="name selected">{{journey.journey}}</div>
         {% for j in journeys %}
-        <a href="/domino/journey/journey.id">
+        <a href="/domino/journey/{{j.id}}">
            
-            <i class="icon icon-journey fas fa-{{journey.icon}}"></i>
+            <i class="icon icon-journey fas fa-{{j.icon}}"></i>
             <div class="name">{{j.journey}}</div>
            
         </a>
