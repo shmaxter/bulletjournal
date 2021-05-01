@@ -7,6 +7,8 @@
         <a href="/domino/newjourney"><i class="d_button collection fas fa-play"></i></a>
         <i class="icon icon-journey fas fa-{{journey.icon}} selected"></i>
         <div class="name selected">{{journey.journey}}</div>
+        <p style="margin-top:15px;padding:5px;font-weight:600;font-size:14px; border:1px solid gray;">{{journey.description}}</p>
+        <a href="/journey/delete/{{journey.id}}"><i class="icon fas fa-trash" aria-hidden="true" style="color:darkslategray;"></i></a>
         {% for j in journeys %}
         <a href="/domino/journey/{{j.id}}">
            

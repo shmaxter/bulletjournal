@@ -66,7 +66,7 @@ def new(request):
         )
         domino.assignedJourney.set(assignedJourneys)
         domino.save()
-        rediredturl = '/domino/id/' + str(domino.id)
+        rediredturl = '/id/' + str(domino.id)
         return redirect(rediredturl)                  
     else:        
         user = request.user
@@ -96,7 +96,7 @@ def newsub(request, domino_id):
         )
         domino.assignedJourney.set(assignedJourneys)
         domino.save()
-        rediredturl = '/domino/id/' + str(domino.id)
+        rediredturl = '/id/' + str(domino.id)
         return redirect(rediredturl)
     else:
         user = request.user
@@ -125,7 +125,7 @@ def update(request, domino_id):
         domino.body = data["body"]
         domino.assignedJourney.set(assignedJourneys)
         domino.save()
-        rediredturl = '/domino/id/' + str(domino.id)
+        rediredturl = '/id/' + str(domino.id)
         return redirect(rediredturl)
     else:
         user = request.user
@@ -154,7 +154,7 @@ def newJourneyDomino(request, journey_id):
         )
         domino.assignedJourney.set(assignedJourneys)
         domino.save()
-        rediredturl = '/domino/journey/' + str(journey_id)
+        rediredturl = '/journey/' + str(journey_id)
         return redirect(rediredturl)
     else:
         user = request.user
@@ -175,7 +175,7 @@ def newnote(request, domino_id):
             newnote.domino = notedomino
             newnote.author = user
             newnote.save()
-            rediredturl = '/domino/id/' + str(domino_id)
+            rediredturl = '/id/' + str(domino_id)
             return redirect(rediredturl)       
     else:
         noteform = NewNoteForm()
@@ -195,7 +195,7 @@ def newtime(request, domino_id):
             if timedomino.timeset == False:
                 timedomino.timeset = True
                 timedomino.save()
-            rediredturl = '/domino/id/' + str(domino_id)
+            rediredturl = '/id/' + str(domino_id)
             return redirect(rediredturl)       
     else:
         #Initiate Form
@@ -212,7 +212,7 @@ def pin(request, domino_id):
         domino.isPinned = True
     domino.DateLastEditted = timezone.now()
     domino.save()
-    rediredturl = '/domino/id/' + str(domino_id)
+    rediredturl = '/id/' + str(domino_id)
     return redirect(rediredturl)
 
 def pinParent(request, domino_id):
@@ -225,7 +225,7 @@ def pinParent(request, domino_id):
         domino.isCompleted = False
     domino.DateLastEditted = timezone.now()
     domino.save()
-    rediredturl = '/domino/id/' + str(domino.parentId.id) + '#d' + str(domino.id)
+    rediredturl = '/id/' + str(domino.parentId.id) + '#d' + str(domino.id)
     return redirect(rediredturl)
     #rediredturl = '/domino/id/' + str(domino.parentId.id)
     #return redirect(rediredturl)
@@ -240,10 +240,20 @@ def pinHome(request, domino_id):
         domino.isCompleted = False
     domino.DateLastEditted = timezone.now()
     domino.save()    
-    rediredturl = '/domino#d' + str(domino_id)
+    rediredturl = '#d' + str(domino_id)
     return redirect(rediredturl)
     #rediredturl = '/domino/'    
     #return redirect(rediredturl)
+
+
+def journeyDelete(request, journey_id):
+    user = request.user
+    journey = Collection.objects.get(author=user.id,id = journey_id)
+    #List Load
+    journey.delete()
+    redirecturl = '/'
+    return redirect(redirecturl)
+    #return HttpResponse("hi")
 
 
 def pinJourney(request, domino_id, journey_id):
@@ -256,7 +266,7 @@ def pinJourney(request, domino_id, journey_id):
         domino.isCompleted = False
     domino.DateLastEditted = timezone.now()
     domino.save()
-    rediredturl = '/domino/journey/' + str(journey_id)
+    rediredturl = '/journey/' + str(journey_id)
     return redirect(rediredturl)
 
 def completeHome(request, domino_id):
@@ -270,7 +280,7 @@ def completeHome(request, domino_id):
     domino.DateLastEditted = timezone.now()
     domino.save()
     #rediredturl = '/domino#d' + str(domino_id)
-    rediredturl = '/domino'
+    rediredturl = '/'
     return redirect(rediredturl)
 
 def completeParent(request, domino_id):
@@ -283,7 +293,7 @@ def completeParent(request, domino_id):
         domino.isPinned = False
     domino.DateLastEditted = timezone.now()
     domino.save()
-    rediredturl = '/domino/id/' + str(domino.parentId.id) + '#d' + str(domino.id)
+    rediredturl = '/id/' + str(domino.parentId.id) + '#d' + str(domino.id)
     return redirect(rediredturl)
 
 
@@ -297,7 +307,7 @@ def completeJourney(request, domino_id, journey_id):
         domino.isPinned = False
     domino.DateLastEditted = timezone.now()
     domino.save()
-    rediredturl = '/domino/journey/' + str(journey_id)
+    rediredturl = '/journey/' + str(journey_id)
     return redirect(rediredturl)
 
 
@@ -311,7 +321,7 @@ def complete(request, domino_id):
         domino.isPinned = False
     domino.DateLastEditted = timezone.now()
     domino.save()
-    rediredturl = '/domino/id/' + str(domino.id)
+    rediredturl = '/id/' + str(domino.id)
     return redirect(rediredturl)
 
 def listitem(request, list_id):
@@ -322,7 +332,7 @@ def listitem(request, list_id):
     else:        
         listitem.checked = True
     listitem.save()
-    rediredturl = '/domino/id/' + str(listitem.domino.id)
+    rediredturl = '/id/' + str(listitem.domino.id)
     return redirect(rediredturl)
 
         
@@ -347,9 +357,9 @@ def delete(request, delete_id):
     #List Load
     domino.delete()
     if domino.parentId:
-        redirecturl = '/domino/id/' + str(domino.parentId.id)
+        redirecturl = '/id/' + str(domino.parentId.id)
     else:
-        redirecturl = '/domino'
+        redirecturl = '/'
     return redirect(redirecturl)
     #return HttpResponse("hi")
 
@@ -358,7 +368,7 @@ def deleteJourneyDomino(request, domino_id, journey_id):
     user = request.user
     domino = Domino.objects.get(author=user.id,id = domino_id)
     domino.delete()
-    rediredturl = '/domino/journey/' + str(journey_id)
+    rediredturl = '/journey/' + str(journey_id)
     return redirect(rediredturl)
 
 def newjourney(request):
@@ -369,7 +379,7 @@ def newjourney(request):
             newjourney = form.save(commit=False)
             newjourney.author = user
             newjourney.save()
-            return redirect('/domino')        
+            return redirect('/')        
     else:        
         user = request.user
         form = NewJourneyForm(author=request.user)
@@ -388,7 +398,7 @@ def updatejourney(request, journey_id):
             editjourney = form.save(commit=False)
             editjourney.author = user            
             editjourney.save()
-            rediredturl = '/domino/journey/' + str(journey_id)
+            rediredturl = '/journey/' + str(journey_id)
             return redirect(rediredturl)
     else:
         user = request.user
@@ -407,7 +417,7 @@ def register(response):
         form = RegisterForm(response.POST)
         if form.is_valid():
             form.save()
-            return redirect('/domino/login')
+            return redirect('/login')
 
         
     else:
@@ -422,7 +432,7 @@ def login(response):
         if form.is_valid():
             form.save()
 
-        return redirect('/domino')
+        return redirect('/')
     else:
         form = RegisterForm()
 
